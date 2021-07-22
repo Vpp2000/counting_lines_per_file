@@ -4,6 +4,12 @@ from scipy import stats
 import numpy as np
 
 
+FILESE_LINES_SIZES = []
+STR_MANIPULATION_ERRORS_MESSAGES = ''
+DIRECTORIES_TO_BE_OMITTED = [
+    r"E:\UNI\DECIMO CICLO SEGUNDA PARTE\CALIDAD DE SOFTWARE\mini-diary-master\src\main\i18n\translations"
+]
+
 def save_log_to_file(string, file):
     text_file = open(file, "w")
     n = text_file.write(string)
@@ -32,25 +38,22 @@ def print_basic_statistics(arr):
     print("Varience =", varience)
     print("Standard Deviation =", sd)
 
-
-FILESE_LINES_SIZES = []
-STR_MANIPULATION_ERRORS_MESSAGES = ''
-
 def count_lines_of_code(path):
-    global STR_MANIPULATION_ERRORS_MESSAGES
-    try:
-        if isfile(path):
-            if path.endswith('.ts'):
-                num_lines = sum(1 for line in open(path))
-                FILESE_LINES_SIZES.append(num_lines)
-                print(f"Number of lines in {path} : {num_lines}")
-        else:
-            ficheros = listdir(path)
-            for fichero in ficheros:
-                count_lines_of_code(join(path, fichero))
-    except UnicodeDecodeError:
-        STR_MANIPULATION_ERRORS_MESSAGES += f"Error manipulating {path} \n"
-        print(f"Error manipulating {path}")
+    if path not in DIRECTORIES_TO_BE_OMITTED:
+        global STR_MANIPULATION_ERRORS_MESSAGES
+        try:
+            if isfile(path) and path.endswith('.ts'):
+                    num_lines = sum(1 for line in open(path))
+                    FILESE_LINES_SIZES.append(num_lines)
+                    print(f"Number of lines in {path} : {num_lines}")
+            elif isdir(path):
+                ficheros = listdir(path)
+                for fichero in ficheros:
+                    count_lines_of_code(join(path, fichero))
+        except UnicodeDecodeError:
+            STR_MANIPULATION_ERRORS_MESSAGES += f"Error manipulating {path} \n"
+            print(f"Error manipulating {path}")
+
 
 PATH = r'E:\UNI\DECIMO CICLO SEGUNDA PARTE\CALIDAD DE SOFTWARE\mini-diary-master\src'
 count_lines_of_code(PATH)
